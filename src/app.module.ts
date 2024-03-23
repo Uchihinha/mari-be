@@ -24,7 +24,7 @@ import configs from 'config/configuration';
     TemplateModule,
     TemplateCategoryModule,
     WebsiteModule,
-    SubscriptionModule,
+    // SubscriptionModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configs],
