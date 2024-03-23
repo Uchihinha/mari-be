@@ -8,10 +8,3 @@ services:
     volumes:
       - .:/home/node/app
 
-  db:
-    image: mysql:8.0.30-debian
-    ports: 
-      - 3356:3306
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: mari_be
