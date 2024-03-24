@@ -10,7 +10,7 @@ phases:
       - echo Create build...
       - npm run build
       - npx prisma migrate deploy
-      - npx prisma db seed
+      # - npx prisma db seed
   post_build:
     commands:
       - echo Removing unnecessary files...
