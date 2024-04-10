@@ -1,0 +1,19 @@
+version: '3.5'
+
+services:
+  db:
+    image: mysql:8
+    restart: always
+    environment:
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+    container_name: mari-db
+    volumes:
+      - mari-db-data:/var/lib/mysql 
+    ports:
+      - '3306:3306'
+
+volumes:
+  mari-db-data:

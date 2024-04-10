@@ -10,11 +10,12 @@ import { PrismaModule } from './prisma/prisma.module';
 import { TemplateModule } from './template/template.module';
 import { TemplateCategoryModule } from './template-category/template-category.module';
 import { WebsiteModule } from './website/website.module';
-import { SubscriptionModule } from './subscription/subscription.module';
 import { ConfigModule } from '@nestjs/config';
 import { PlanModule } from './plan/plan.module';
 import { PlanBenefitModule } from './plan-benefit/plan-benefit.module';
+import { PasswordResetModule } from './password-reset/password-reset.module';
 import configs from 'config/configuration';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -24,24 +25,26 @@ import configs from 'config/configuration';
     TemplateModule,
     TemplateCategoryModule,
     WebsiteModule,
-    // SubscriptionModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configs],
     }),
     PlanModule,
     PlanBenefitModule,
+    PasswordResetModule,
+    MailModule,
   ],
   controllers: [AppController],
-  providers: [AppService,
+  providers: [
+    AppService,
     {
       provide: APP_GUARD,
-      useClass: AuthGuard
+      useClass: AuthGuard,
     },
     {
       provide: APP_GUARD,
-      useClass: RolesGuard
+      useClass: RolesGuard,
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}
