@@ -14,7 +14,7 @@ export class EmailService {
       to,
       subject: 'Reset your password',
       body: `Click on this link to reset your password: ${frontEndPath(
-        '/reset-password/' + token,
+        '/troca-de-senha?token=' + token,
       )}`,
     });
   }
