@@ -16,7 +16,7 @@ export class PasswordResetService {
     private emailSerivce: EmailService,
   ) {}
 
-  async createPasswordReset(email: string): Promise<void> {
+  async createPasswordReset(email: string): Promise<{message: string}> {
     const user = await this.prisma.user.findUnique({ where: { email } });
 
     if (!user) {
@@ -39,9 +39,13 @@ export class PasswordResetService {
     });
 
     await this.emailSerivce.sendPasswordResetEmail(user.email, token);
+
+    return {
+      message: 'Email enviado'
+    }
   }
 
-  async resetPassword(token: string, password: string): Promise<void> {
+  async resetPassword(token: string, password: string): Promise<{message: string}> {
     const passwordReset = await this.prisma.passwordReset.findFirst({
       where: { token },
       include: { user: true },
@@ -63,5 +67,9 @@ export class PasswordResetService {
     });
 
     await this.prisma.passwordReset.delete({ where: { id: passwordReset.id } });
+
+    return {
+      message: 'Senha resetada com sucesso'
+    }
   }
 }
