@@ -16,6 +16,7 @@ import { PlanBenefitModule } from './plan-benefit/plan-benefit.module';
 import { PasswordResetModule } from './password-reset/password-reset.module';
 import configs from 'config/configuration';
 import { MailModule } from './mail/mail.module';
+import { AssetModule } from './asset/asset.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { MailModule } from './mail/mail.module';
     PlanBenefitModule,
     PasswordResetModule,
     MailModule,
+    AssetModule,
   ],
   controllers: [AppController],
   providers: [
