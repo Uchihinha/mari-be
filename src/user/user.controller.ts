@@ -1,12 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+  Req,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Public } from 'src/auth/auth.guard';
+import excludePasswordFromUser from 'src/helpers/exclude';
 
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -25,8 +36,12 @@ export class UserController {
   }
 
   @Patch(':id')
-  update(@Param('id', new ParseIntPipe()) id: number, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(id, updateUserDto);
+  async update(
+    @Param('id', new ParseIntPipe()) id: number,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    const user = await this.userService.update(id, updateUserDto);
+    return excludePasswordFromUser(user, ['password']);
   }
 
   @Delete(':id')

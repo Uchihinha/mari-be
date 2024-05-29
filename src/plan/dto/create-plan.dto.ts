@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export enum PlanFrequency {
   YEARLY = 'YEARLY',
@@ -12,9 +12,13 @@ export class CreatePlanDto {
 
   @IsString()
   @IsNotEmpty()
-  frequency: PlanFrequency;
+  recurrence: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  price: number;
 
   @IsString()
   @IsNotEmpty()
-  stripeProductId: string;
+  stripePriceId: string;
 }

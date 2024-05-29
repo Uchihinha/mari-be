@@ -8,26 +8,66 @@ import {
   ParseFilePipe,
   Patch,
   Post,
+  Put,
   Req,
   Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, NoFilesInterceptor } from '@nestjs/platform-express';
 import * as crypto from 'crypto';
 import { AwsService } from 'src/aws/aws.service';
 import { AssetService } from './asset.service';
 import { CreateAssetDto } from './dto/create-asset.dto';
 import { UpdateAssetDto } from './dto/update-asset.dto';
+import * as fs from 'fs';
 
 @Controller('assets')
 export class AssetController {
   constructor(
     private readonly assetService: AssetService,
     private readonly awsService: AwsService,
-    private readonly configService: ConfigService
-  ) { }
+    private readonly configService: ConfigService,
+  ) {}
+
+  @Put('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  async updateFile(
+    @Res() res,
+    @Req() request,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new MaxFileSizeValidator({ maxSize: 10000000 })],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    try {
+      console.log(file);
+      console.log(request.body);
+      const splitted = request.body.destination.split('/');
+      const filename = splitted[splitted.length - 1];
+      const bucketName = `${this.configService.get('AWS_BUCKET_NAME')}/pages/previews`;
+
+      const path = await this.awsService.uploadFile(
+        file,
+        filename,
+        bucketName,
+        true,
+      );
+
+      await this.assetService.create({
+        url: request.body.destination,
+        userId: request.user.userId,
+      });
+
+      return res.status(201).json(request.body.destination);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(error);
+    }
+  }
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
@@ -36,30 +76,32 @@ export class AssetController {
     @Req() request,
     @UploadedFile(
       new ParseFilePipe({
-        validators: [
-          new MaxFileSizeValidator({ maxSize: 10000000 }),
-        ],
+        validators: [new MaxFileSizeValidator({ maxSize: 10000000 })],
       }),
     )
     file: Express.Multer.File,
   ) {
     try {
+      const { destination } = request.body;
       const fileExtension = file.originalname.split('.').pop();
       const filename = `${Date.now()}-${crypto.randomUUID()}.${fileExtension}`;
 
-      const { path } = await this.awsService.uploadFile(file, filename);
+      const { path } = await this.awsService.uploadFile(
+        file,
+        filename,
+        destination,
+      );
       const bucketOrigin = this.configService.get('AWS_BUCKET_URL');
-      console.log(path)
       const url = `${bucketOrigin}/${path}`;
 
       await this.assetService.create({
         url,
         userId: request.user.userId,
-      })
+      });
 
-      return res.status(201).json(path);
+      return res.status(201).json(url);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return res.status(500).json(error);
     }
   }

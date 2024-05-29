@@ -11,16 +11,31 @@ export class AwsService {
     secretAccessKey: this.configService.get('AWS_SECRET_ACCESS_KEY'),
   });
 
-  constructor(private configService: ConfigService) { }
+  constructor(private configService: ConfigService) {}
 
   async uploadFile(
     file: Express.Multer.File,
     filename: string,
+    destination: string,
+    replace = false,
   ): Promise<{ url: string; path: string }> {
     const fileTypeInfo = await fromBuffer(file.buffer);
 
+    let bucketName = '';
+    if (replace) {
+      bucketName = destination;
+    } else if (destination && !replace) {
+      bucketName = `${this.bucketName}/${destination}`;
+    } else {
+      bucketName = this.bucketName;
+    }
+
+    console.log('bucket', bucketName);
+
+    // return { url: '', path: '' };
+
     const params = {
-      Bucket: this.bucketName,
+      Bucket: bucketName,
       Key: filename,
       Body: file.buffer,
       ACL: 'public-read',

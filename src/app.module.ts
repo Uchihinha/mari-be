@@ -17,6 +17,8 @@ import { PasswordResetModule } from './password-reset/password-reset.module';
 import configs from 'config/configuration';
 import { MailModule } from './mail/mail.module';
 import { AssetModule } from './asset/asset.module';
+import { TutorialVideoModule } from './tutorial-video/tutorial-video.module';
+import { SubscriptionModule } from './subscription/subscription.module';
 
 @Module({
   imports: [
@@ -35,6 +37,8 @@ import { AssetModule } from './asset/asset.module';
     PasswordResetModule,
     MailModule,
     AssetModule,
+    TutorialVideoModule,
+    SubscriptionModule,
   ],
   controllers: [AppController],
   providers: [

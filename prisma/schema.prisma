@@ -28,6 +28,16 @@ enum WebsiteStatus {
   DISABLED
 }
 
+enum StripeSubscriptionStatus {
+  active
+  canceled
+  incomplete
+  incomplete_expired
+  past_due
+  trialing
+  unpaid
+}
+
 model TemplateCategory {
   id        Int        @id @default(autoincrement())
   name      String
@@ -37,7 +47,7 @@ model TemplateCategory {
 model Website {
   id     Int           @id @default(autoincrement())
   title  String
-  domain String
+  domain String        @unique
   html   String?       @db.Text
   css    String?       @db.Text
   user   User          @relation(fields: [userId], references: [id])
@@ -56,38 +66,63 @@ model UserTemplate {
 }
 
 model User {
-  id                   Int             @id @default(autoincrement())
+  id                   Int                @id @default(autoincrement())
   name                 String
-  email                String          @unique
+  email                String             @unique
   password             String
-  createdAt            DateTime        @default(now())
-  updatedAt            DateTime        @updatedAt
-  role                 Role            @default(User)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  role                 Role               @default(User)
   userTemplate         UserTemplate[]
   website              Website[]
-  plan                 Plan?           @relation(fields: [planId], references: [id])
+  plan                 Plan?              @relation(fields: [planId], references: [id])
   planId               Int?
   stripeSubscriptionId String?
   stripeCustomerId     String?
   passwordResets       PasswordReset[]
   Asset                Asset[]
+  UserSubscription     UserSubscription[]
+}
+
+model UserSubscription {
+  id Int @id @default(autoincrement())
+
+  user                 User                     @relation(fields: [userId], references: [id])
+  userId               Int
+  status               StripeSubscriptionStatus
+  stripeSubscriptionId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, stripeSubscriptionId])
 }
 
 model Plan {
-  id              Int            @id @default(autoincrement())
-  name            String
-  frequency       PlanFrequency
-  stripeProductId String         @unique()
-  benefits        PlanBenefits[]
-  users           User[]
+  id Int @id @default(autoincrement())
+
+  name          String @unique
+  stripePriceId String
+  price         Float
+  recurrence    String
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  planBenefits PlanBenefit[]
+  users        User[]
 }
 
-model PlanBenefits {
-  id            Int    @id @default(autoincrement())
-  name          String
-  websiteAmount Int
-  plan          Plan[]
-  planId        Int
+model PlanBenefit {
+  id Int @id @default(autoincrement())
+
+  planId Int
+  plan   Plan @relation(fields: [planId], references: [id])
+
+  key   String
+  value String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Template {
@@ -117,4 +152,12 @@ model Asset {
   url    String
   user   User   @relation(fields: [userId], references: [id])
   userId Int
+}
+
+model TutorialVideos {
+  id          Int    @id @default(autoincrement())
+  title       String
+  description String
+  url         String
+  thumbnail   String
 }

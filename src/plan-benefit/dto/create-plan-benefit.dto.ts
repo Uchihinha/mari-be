@@ -1,15 +1,15 @@
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreatePlanBenefitDto {
+  @IsNumber()
+  @IsNotEmpty()
+  planId: never;
+
   @IsString()
   @IsNotEmpty()
-  name: string;
+  key: string;
 
   @IsNumber()
   @IsNotEmpty()
-  planId: number;
-
-  @IsNumber()
-  @IsNotEmpty()
-  websiteAmount: number;
+  value: string;
 }

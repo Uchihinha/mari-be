@@ -11,24 +11,26 @@ import { SignUpDto } from './dto/sign-up.dto';
 export class AuthService {
   constructor(
     private jwtService: JwtService,
-    private prisma: PrismaService
-  ) { }
+    private prisma: PrismaService,
+  ) {}
 
   async signUp(signUpInput: SignUpDto) {
     const password = await argon.hash(signUpInput.password);
 
     const user = await this.prisma.user.create({
-      data: { email: signUpInput.email, name: signUpInput.name, password }
+      data: { email: signUpInput.email, name: signUpInput.name, password },
     });
 
-    const { accessToken, refreshToken } = await this.createToken(
-      user,
-    );
+    const { accessToken, refreshToken } = await this.createToken(user);
 
     return {
       accessToken,
       refreshToken,
-      user,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      },
     };
   }
 
@@ -50,14 +52,16 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
-    const { accessToken, refreshToken } = await this.createToken(
-      user,
-    );
+    const { accessToken, refreshToken } = await this.createToken(user);
 
     return {
       accessToken,
       refreshToken,
-      user,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      },
     };
   }
 
@@ -65,7 +69,7 @@ export class AuthService {
     const payload = {
       email: user.email,
       userId: user.id,
-      roles: user.role.toLowerCase()
+      roles: user.role.toLowerCase(),
     };
 
     return {

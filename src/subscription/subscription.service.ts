@@ -6,23 +6,31 @@ import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 
 @Injectable()
 export class SubscriptionService {
-  constructor(@InjectStripeClient() private stripe: Stripe, private prisma: PrismaService) { }
+  constructor(
+    @InjectStripeClient() private stripe: Stripe,
+    private prisma: PrismaService,
+  ) {}
 
   async getSubscriptions(req: any) {
-    const userCustomerId = (await this.prisma.user.findUniqueOrThrow({ where: { id: req.user.userId } })).stripeCustomerId;
-    const stripeSub = await this.stripe.subscriptions.list({ customer: userCustomerId });
+    const userCustomerId = (
+      await this.prisma.user.findUniqueOrThrow({
+        where: { id: req.user.userId },
+      })
+    ).stripeCustomerId;
+    const stripeSub = await this.stripe.subscriptions.list({
+      customer: userCustomerId,
+    });
     return stripeSub;
   }
-
 
   async createSubscriptionSession(
     user: any,
     priceId: string,
   ): Promise<Stripe.Response<Stripe.Checkout.Session> | undefined> {
-    console.log(priceId)
+    console.log(priceId);
     try {
       const sub = this.stripe.checkout.sessions.create({
-        success_url: 'http://localhost:3001/minha-assinatura',
+        success_url: 'http://localhost:3000/minha-assinatura',
         customer_email: user.email,
         line_items: [
           {
