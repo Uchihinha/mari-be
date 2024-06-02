@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateAssetDto {
   @IsNumber()
@@ -8,4 +8,7 @@ export class CreateAssetDto {
   @IsString()
   @IsNotEmpty()
   url: string;
+
+  @IsNotEmpty()
+  type: any;
 }

@@ -22,6 +22,7 @@ import { AssetService } from './asset.service';
 import { CreateAssetDto } from './dto/create-asset.dto';
 import { UpdateAssetDto } from './dto/update-asset.dto';
 import * as fs from 'fs';
+import { AssetType } from '@prisma/client';
 
 @Controller('assets')
 export class AssetController {
@@ -46,6 +47,7 @@ export class AssetController {
     try {
       console.log(file);
       console.log(request.body);
+      const { type } = request.body;
       const splitted = request.body.destination.split('/');
       const filename = splitted[splitted.length - 1];
       const bucketName = `${this.configService.get('AWS_BUCKET_NAME')}/pages/previews`;
@@ -57,9 +59,12 @@ export class AssetController {
         true,
       );
 
+      const enumType = type == 'PAGE' ? AssetType.page : AssetType.IMAGE;
+
       await this.assetService.create({
         url: request.body.destination,
         userId: request.user.userId,
+        type: enumType,
       });
 
       return res.status(201).json(request.body.destination);
@@ -82,7 +87,7 @@ export class AssetController {
     file: Express.Multer.File,
   ) {
     try {
-      const { destination } = request.body;
+      const { destination, type } = request.body;
       const fileExtension = file.originalname.split('.').pop();
       const filename = `${Date.now()}-${crypto.randomUUID()}.${fileExtension}`;
 
@@ -94,9 +99,12 @@ export class AssetController {
       const bucketOrigin = this.configService.get('AWS_BUCKET_URL');
       const url = `${bucketOrigin}/${path}`;
 
+      const enumType = type == 'PAGE' ? AssetType.page : AssetType.IMAGE;
+
       await this.assetService.create({
         url,
         userId: request.user.userId,
+        type: enumType,
       });
 
       return res.status(201).json(url);

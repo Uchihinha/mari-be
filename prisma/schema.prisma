@@ -38,6 +38,11 @@ enum StripeSubscriptionStatus {
   unpaid
 }
 
+enum AssetType {
+  IMAGE
+  PAGE
+}
+
 model TemplateCategory {
   id        Int        @id @default(autoincrement())
   name      String
@@ -148,10 +153,11 @@ model PasswordReset {
 }
 
 model Asset {
-  id     Int    @id @default(autoincrement())
+  id     Int       @id @default(autoincrement())
   url    String
-  user   User   @relation(fields: [userId], references: [id])
+  user   User      @relation(fields: [userId], references: [id])
   userId Int
+  type   AssetType
 }
 
 model TutorialVideos {
