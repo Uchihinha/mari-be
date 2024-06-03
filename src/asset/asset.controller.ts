@@ -59,7 +59,7 @@ export class AssetController {
         true,
       );
 
-      const enumType = type == 'PAGE' ? AssetType.page : AssetType.IMAGE;
+      const enumType = type == 'PAGE' ? AssetType.PAGE : AssetType.IMAGE;
 
       await this.assetService.create({
         url: request.body.destination,
@@ -99,7 +99,7 @@ export class AssetController {
       const bucketOrigin = this.configService.get('AWS_BUCKET_URL');
       const url = `${bucketOrigin}/${path}`;
 
-      const enumType = type == 'PAGE' ? AssetType.page : AssetType.IMAGE;
+      const enumType = type == 'PAGE' ? AssetType.PAGE : AssetType.IMAGE;
 
       await this.assetService.create({
         url,
