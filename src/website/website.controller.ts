@@ -28,6 +28,11 @@ export class WebsiteController {
     return this.websiteService.findDomains(request);
   }
 
+  @Post('domain')
+  createDomain(@Req() request: Request) {
+    return this.websiteService.createNewDomain(request);
+  }
+
   @Get()
   findAll(@Req() request: Request) {
     return this.websiteService.findAll(request);

@@ -25,6 +25,46 @@ export class WebsiteService {
     });
   }
 
+  async getDomainConfiguration(req: any) {
+    // https://api.vercel.com/v6/domains/lp.omegaconta.com.br/config
+    const request = await fetch(
+      'https://api.vercel.com/v6/domains/lp.omegaconta.com.br/config',
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer FaNzTLxaR9TBQ5j63AQkOP3i',
+        },
+      },
+    );
+  }
+
+  async createNewDomain(req: any) {
+    const { url, websiteId } = req.body;
+    console.log('createNewDomain ->', url);
+    return await fetch('https://api.vercel.com/v10/projects/mari-ia/domains', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer 7dWEzngCMergoNdcUL3t12uY',
+      },
+      body: JSON.stringify({
+        name: url,
+      }),
+    }).then(async (r: any) => {
+      const nr = await r.json();
+      console.log('nr', nr);
+      if (nr.error) {
+        console.log('fall into eerror');
+        return {
+          ok: false,
+          ...nr,
+        };
+      }
+
+      return nr;
+    });
+  }
+
   async findDomains(req: any) {
     const { userId } = req.user;
     const websites = await this.prisma.website.findMany({

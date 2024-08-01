@@ -45,13 +45,7 @@ export class AssetController {
     file: Express.Multer.File,
   ) {
     try {
-      console.log(file);
-      console.log(request.body);
-      const { type } = request.body;
-      const splitted = request.body.destination.split('/');
-      const filename = splitted[splitted.length - 1];
-      const bucketName = `${this.configService.get('AWS_BUCKET_NAME')}/pages/previews`;
-
+      const { type, filename, destination, bucketName } = request.body;
       const path = await this.awsService.uploadFile(
         file,
         filename,
@@ -60,7 +54,6 @@ export class AssetController {
       );
 
       const enumType = type == 'PAGE' ? AssetType.PAGE : AssetType.IMAGE;
-
       await this.assetService.create({
         url: request.body.destination,
         userId: request.user.userId,
@@ -87,27 +80,31 @@ export class AssetController {
     file: Express.Multer.File,
   ) {
     try {
-      const { destination, type } = request.body;
-      const fileExtension = file.originalname.split('.').pop();
-      const filename = `${Date.now()}-${crypto.randomUUID()}.${fileExtension}`;
+      const { type, filename, destination, bucketName } = request.body;
+
+      console.log('filename', filename);
+      console.log('destination', destination);
+      console.log('bucketName', bucketName);
 
       const { path } = await this.awsService.uploadFile(
         file,
         filename,
         destination,
       );
-      const bucketOrigin = this.configService.get('AWS_BUCKET_URL');
-      const url = `${bucketOrigin}/${path}`;
+      // const bucketOrigin = this.configService.get('AWS_BUCKET_URL');
+      // const url = `${bucketOrigin}/${path}`;
 
       const enumType = type == 'PAGE' ? AssetType.PAGE : AssetType.IMAGE;
 
       await this.assetService.create({
-        url,
+        url: destination,
         userId: request.user.userId,
         type: enumType,
       });
 
-      return res.status(201).json(url);
+      console.log('destination', destination);
+
+      return res.status(201).json(destination);
     } catch (error) {
       console.log(error);
       return res.status(500).json(error);

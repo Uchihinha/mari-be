@@ -30,7 +30,8 @@ export class AwsService {
       bucketName = this.bucketName;
     }
 
-    console.log('bucket', bucketName);
+    // console.log('filename 222', filename);
+    // console.log('bucket', bucketName);
 
     // return { url: '', path: '' };
 
