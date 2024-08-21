@@ -5,25 +5,32 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class TemplateService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   create(createTemplateDto: CreateTemplateDto) {
     return this.prisma.template.create({ data: createTemplateDto });
   }
 
-  findAll() {
-    return this.prisma.template.findMany();
+  findAll(params = {}) {
+    return this.prisma.template.findMany(params);
+  }
+
+  getFive() {
+    return this.prisma.template.findMany({ take: 5 });
   }
 
   findOne(id: number) {
-    return this.prisma.template.findUniqueOrThrow({ where: { id } })
+    return this.prisma.template.findUniqueOrThrow({ where: { id } });
   }
 
   update(id: number, updateTemplateDto: UpdateTemplateDto) {
-    return this.prisma.template.update({ where: { id }, data: updateTemplateDto })
+    return this.prisma.template.update({
+      where: { id },
+      data: updateTemplateDto,
+    });
   }
 
   remove(id: number) {
-    return this.prisma.template.delete({ where: { id } })
+    return this.prisma.template.delete({ where: { id } });
   }
 }
